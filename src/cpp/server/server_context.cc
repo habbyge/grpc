@@ -39,9 +39,8 @@ namespace grpc {
 
 // CompletionOp
 
-class ServerContextBase::CompletionOp final
-    : public internal::CallOpSetInterface {
- public:
+class ServerContextBase::CompletionOp final : public internal::CallOpSetInterface {
+public:
   // initial refs: one in the server context, one in the cq
   // must ref the call before calling constructor and after deleting this
   CompletionOp(internal::Call* call,
