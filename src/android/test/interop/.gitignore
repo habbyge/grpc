@@ -7,3 +7,11 @@
 /build
 /captures
 .externalNativeBuild
+
+# 忽略ccls的cache文件
+.ccls-cache
+.ccls-cache/*
+build
+build/*
+.vscode
+.vscode/*
