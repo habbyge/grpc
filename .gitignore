@@ -151,3 +151,6 @@ BenchmarkDotNet.Artifacts/
 
 # pyenv config
 .python-version
+
+.ccls-cache
+.ccls-cache/*
