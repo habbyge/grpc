@@ -16,6 +16,21 @@
  *
  */
 
+/**
+ * Google Protobuf简明教程
+ * https://www.jianshu.com/p/b723053a86a6
+ * 
+ * gRPC详解
+ * https://www.jianshu.com/p/9c947d98e192
+ * 
+ * gRPC中文官方文档
+ * https://doc.oschina.net/grpc?t=58008
+ * 
+ * gRPC那些事儿
+ * https://colobu.com/2017/04/06/dive-into-gRPC-streaming/
+ */
+
+
 #ifndef GRPC_INTERNAL_CPP_DYNAMIC_THREAD_POOL_H
 #define GRPC_INTERNAL_CPP_DYNAMIC_THREAD_POOL_H
 
@@ -40,18 +55,21 @@ public:
 
 private:
   class DynamicThread {
-   public:
+  public:
     DynamicThread(DynamicThreadPool* pool);
     ~DynamicThread();
 
-   private:
+  private:
     DynamicThreadPool* pool_;
     grpc_core::Thread thd_;
+
     void ThreadFunc();
   };
+
   grpc_core::Mutex mu_;
   grpc_core::CondVar cv_;
   grpc_core::CondVar shutdown_cv_;
+  
   bool shutdown_;
   std::queue<std::function<void()>> callbacks_;
   int reserve_threads_;

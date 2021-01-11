@@ -32,13 +32,14 @@ namespace grpc_core {
 // implementation from Dmitry Vyukov here:
 // http://www.1024cores.net/home/lock-free-algorithms/queues/intrusive-mpsc-node-based-queue
 class MultiProducerSingleConsumerQueue {
- public:
+public:
   // List node.  Application node types can inherit from this.
   struct Node {
     Atomic<Node*> next;
   };
 
   MultiProducerSingleConsumerQueue() : head_{&stub_}, tail_(&stub_) {}
+ 
   ~MultiProducerSingleConsumerQueue() {
     GPR_ASSERT(head_.Load(MemoryOrder::RELAXED) == &stub_);
     GPR_ASSERT(tail_ == &stub_);
@@ -57,12 +58,13 @@ class MultiProducerSingleConsumerQueue {
   // not.
   Node* PopAndCheckEnd(bool* empty);
 
- private:
+private:
   // make sure head & tail don't share a cacheline
   union {
     char padding_[GPR_CACHELINE_SIZE];
     Atomic<Node*> head_;
   };
+
   Node* tail_;
   Node stub_;
 };
@@ -70,7 +72,7 @@ class MultiProducerSingleConsumerQueue {
 // An mpscq with a lock: it's safe to pop from multiple threads, but doing
 // only one thread will succeed concurrently.
 class LockedMultiProducerSingleConsumerQueue {
- public:
+public:
   typedef MultiProducerSingleConsumerQueue::Node Node;
 
   // Push a node
@@ -88,7 +90,7 @@ class LockedMultiProducerSingleConsumerQueue {
   // calling this function
   Node* Pop();
 
- private:
+private:
   MultiProducerSingleConsumerQueue queue_;
   Mutex mu_;
 };

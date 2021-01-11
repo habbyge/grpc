@@ -38,23 +38,33 @@
 namespace grpc_core {
 
 class Mutex {
- public:
-  Mutex() { gpr_mu_init(&mu_); }
-  ~Mutex() { gpr_mu_destroy(&mu_); }
+public:
+  Mutex() { 
+    gpr_mu_init(&mu_); 
+  }
+  
+  ~Mutex() { 
+    gpr_mu_destroy(&mu_); 
+  }
 
   Mutex(const Mutex&) = delete;
   Mutex& operator=(const Mutex&) = delete;
 
-  gpr_mu* get() { return &mu_; }
-  const gpr_mu* get() const { return &mu_; }
+  gpr_mu* get() { 
+    return &mu_; 
+  }
 
- private:
+  const gpr_mu* get() const { 
+    return &mu_; 
+  }
+
+private:
   gpr_mu mu_;
 };
 
 // MutexLock is a std::
 class MutexLock {
- public:
+public:
   explicit MutexLock(Mutex* mu) : mu_(mu->get()) { gpr_mu_lock(mu_); }
   explicit MutexLock(gpr_mu* mu) : mu_(mu) { gpr_mu_lock(mu_); }
   ~MutexLock() { gpr_mu_unlock(mu_); }
@@ -62,14 +72,15 @@ class MutexLock {
   MutexLock(const MutexLock&) = delete;
   MutexLock& operator=(const MutexLock&) = delete;
 
- private:
+private:
   gpr_mu* const mu_;
 };
 
 class ReleasableMutexLock {
- public:
+public:
   explicit ReleasableMutexLock(Mutex* mu) : mu_(mu->get()) { gpr_mu_lock(mu_); }
   explicit ReleasableMutexLock(gpr_mu* mu) : mu_(mu) { gpr_mu_lock(mu_); }
+  
   ~ReleasableMutexLock() {
     if (!released_) gpr_mu_unlock(mu_);
   }
@@ -89,13 +100,13 @@ class ReleasableMutexLock {
     gpr_mu_unlock(mu_);
   }
 
- private:
+private:
   gpr_mu* const mu_;
   bool released_ = false;
 };
 
 class CondVar {
- public:
+public:
   CondVar() { gpr_cv_init(&cv_); }
   ~CondVar() { gpr_cv_destroy(&cv_); }
 
@@ -105,7 +116,10 @@ class CondVar {
   void Signal() { gpr_cv_signal(&cv_); }
   void Broadcast() { gpr_cv_broadcast(&cv_); }
 
-  int Wait(Mutex* mu) { return Wait(mu, gpr_inf_future(GPR_CLOCK_REALTIME)); }
+  int Wait(Mutex* mu) { 
+    return Wait(mu, gpr_inf_future(GPR_CLOCK_REALTIME)); 
+  }
+
   int Wait(Mutex* mu, const gpr_timespec& deadline) {
     return gpr_cv_wait(&cv_, mu->get(), deadline);
   }
@@ -121,12 +135,13 @@ class CondVar {
   template <typename Predicate>
   bool WaitUntil(Mutex* mu, Predicate pred, const gpr_timespec& deadline) {
     while (!pred()) {
-      if (Wait(mu, deadline)) return true;
+      if (Wait(mu, deadline)) 
+        return true;
     }
     return false;
   }
 
- private:
+private:
   gpr_cv cv_;
 };
 
